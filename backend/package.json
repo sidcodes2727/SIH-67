@@ -1,0 +1,26 @@
+{
+  "name": "hmpi-backend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js",
+    "db:init": "node src/utils/run-sql.js sql/schema.sql",
+    "db:seed": "node src/utils/run-sql.js sql/seed.sql"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "csv-parse": "^5.5.6",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "helmet": "^7.1.0",
+    "joi": "^17.13.3",
+    "json2csv": "^6.0.0-alpha.2",
+    "morgan": "^1.10.0",
+    "multer": "^2.0.0",
+    "pdfkit": "^0.15.0",
+    "pg": "^8.12.0",
+    "xlsx": "^0.18.5"
+  }
+}
