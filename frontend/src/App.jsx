@@ -7,6 +7,7 @@ import Upload from './pages/Upload.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import About from './pages/About.jsx';
 import PageTransition from './components/PageTransition.jsx';
+import ChatWidget from './components/ChatWidget.jsx';
 
 export default function App() {
   const [route, setRoute] = useState('home');
@@ -48,6 +49,7 @@ export default function App() {
         </AnimatePresence>
       </main>
       <Footer />
+      <ChatWidget />
     </div>
   );
 }

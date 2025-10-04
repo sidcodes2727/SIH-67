@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import dataRoutes from './routes/dataRoutes.js';
 import hmpiRoutes from './routes/hmpiRoutes.js';
 import exportRoutes from './routes/exportRoutes.js';
+import chatRoutes from './routes/chatRoutes.js';
 import { errorHandler, notFound } from './middleware/errorHandler.js';
 
 const app = express();
@@ -19,6 +20,7 @@ app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 app.use('/api/data', dataRoutes);
 app.use('/api/hmpi', hmpiRoutes);
 app.use('/api/export', exportRoutes);
+app.use('/api/chat', chatRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
