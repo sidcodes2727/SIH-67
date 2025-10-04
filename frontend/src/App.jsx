@@ -6,6 +6,7 @@ import Home from './pages/Home.jsx';
 import Upload from './pages/Upload.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import About from './pages/About.jsx';
+import WorldMap from './pages/WorldMap.jsx';
 import PageTransition from './components/PageTransition.jsx';
 import ChatWidget from './components/ChatWidget.jsx';
 
@@ -35,6 +36,7 @@ export default function App() {
     switch (route) {
       case 'upload': return <Upload />;
       case 'dashboard': return <Dashboard />;
+      case 'worldmap': return <WorldMap />;
       case 'about': return <About />;
       default: return <Home onQuickNav={navigate} />;
     }

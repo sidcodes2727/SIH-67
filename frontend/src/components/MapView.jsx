@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
 export default function MapView({ points }) {
   const center = points[0] ? [points[0].latitude, points[0].longitude] : [20.5937, 78.9629];
   return (
-    <div className="card p-2 h-96">
+    <div className="card p-2 h-full w-full">
       <MapContainer center={center} zoom={5} style={{ height: '100%', width: '100%', borderRadius: '0.75rem' }}>
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         {points.map((p, i) => (

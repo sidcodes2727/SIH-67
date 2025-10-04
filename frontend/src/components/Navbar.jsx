@@ -14,6 +14,7 @@ export default function Navbar({ onNavigate, onBack, canGoBack }) {
           <button onClick={() => onNavigate('home')} className="hover:text-primary transition-colors">Home</button>
           <button onClick={() => onNavigate('upload')} className="hover:text-primary transition-colors">Upload Data</button>
           <button onClick={() => onNavigate('dashboard')} className="hover:text-primary transition-colors">Dashboard</button>
+          <button onClick={() => onNavigate('worldmap')} className="hover:text-primary transition-colors">World Map</button>
           <button onClick={() => onNavigate('about')} className="hover:text-primary transition-colors">About</button>
         </nav>
         <MobileNav onNavigate={onNavigate} />
@@ -45,6 +46,7 @@ function MobileNav({ onNavigate }) {
               <button className="text-left hover:text-primary" onClick={() => { onNavigate('home'); setOpen(false); }}>Home</button>
               <button className="text-left hover:text-primary" onClick={() => { onNavigate('upload'); setOpen(false); }}>Upload Data</button>
               <button className="text-left hover:text-primary" onClick={() => { onNavigate('dashboard'); setOpen(false); }}>Dashboard</button>
+              <button className="text-left hover:text-primary" onClick={() => { onNavigate('worldmap'); setOpen(false); }}>World Map</button>
               <button className="text-left hover:text-primary" onClick={() => { onNavigate('about'); setOpen(false); }}>About</button>
             </div>
           </div>
