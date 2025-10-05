@@ -54,51 +54,63 @@ export default function ChatWidget() {
 
   return (
     <>
+      {/* Floating chat PNG icon toggle (larger, fitted in circle) */}
       <button
         onClick={() => setOpen((v) => !v)}
-        className="fixed bottom-6 right-6 z-40 rounded-full bg-emerald-600 text-white shadow-lg px-4 py-3 hover:bg-emerald-700"
-        aria-label="Open chatbot"
+        className="fixed bottom-8 right-8 z-40 grid place-items-center w-20 h-20 rounded-full bg-white/10 border border-white/15 backdrop-blur hover:bg-white/20 transition overflow-hidden ring-1 ring-white/10 hover:ring-white/30 focus-visible:ring-white/40 p-2"
+        aria-label={open ? 'Close chatbot' : 'Open chatbot'}
       >
-        {open ? 'Close Chat' : 'Chat'}
+        <img src="/src/assets/logo.png" alt="Logo" className="w-full h-full object-contain pointer-events-none" />
       </button>
 
       {open && (
-        <div className="fixed bottom-20 right-6 z-40 w-96 max-w-[95vw] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl flex flex-col overflow-hidden">
-          <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm font-semibold">
-            HMPI Assistant
+        <div className="fixed bottom-24 right-6 z-40 w-[28rem] max-w-[95vw] bg-card/95 backdrop-blur border border-white/10 rounded-xl shadow-2xl flex flex-col overflow-hidden">
+          {/* Header */}
+          <div className="px-4 py-3 border-b border-white/10 bg-white/5 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <img src="/src/assets/logo.png" alt="Logo" className="w-5 h-5 rounded" />
+              <div className="text-sm font-semibold">JalDrishti Assistant</div>
+            </div>
+            <button
+              onClick={() => setOpen(false)}
+              className="px-2 py-1 rounded-md border border-white/15 hover:border-white/30 hover:bg-white/5 text-sm"
+              aria-label="Close chat"
+            >
+              ✕
+            </button>
           </div>
           <div
             ref={listRef}
             onScroll={onScroll}
             onWheel={(e) => e.stopPropagation()}
-            className="flex-1 overflow-y-auto p-3 space-y-3 max-h-[60vh] h-96"
+            className="flex-1 overflow-y-auto p-4 space-y-3 max-h-[60vh] h-96"
           >
             {messages.map((m, i) => (
               <div key={i} className={m.role === 'user' ? 'text-right' : 'text-left'}>
-                <div className={`inline-block px-3 py-2 rounded-lg text-sm whitespace-pre-wrap ${m.role === 'user' ? 'bg-emerald-600 text-white' : 'bg-gray-100 dark:bg-gray-800 dark:text-gray-100'}`}>
+                <div className={`inline-block px-3 py-2 rounded-lg text-sm whitespace-pre-wrap ${m.role === 'user' ? 'bg-primary text-bg' : 'bg-white/5 border border-white/10'}`}>
                   {m.content}
                 </div>
               </div>
             ))}
             {loading && (
               <div className="text-left">
-                <div className="inline-block px-3 py-2 rounded-lg text-sm bg-gray-100 dark:bg-gray-800 animate-pulse">Typing…</div>
+                <div className="inline-block px-3 py-2 rounded-lg text-sm bg-white/5 border border-white/10 animate-pulse">Typing…</div>
               </div>
             )}
           </div>
-          <div className="p-3 border-t border-gray-200 dark:border-gray-700 flex gap-2">
+          <div className="p-3 border-t border-white/10 bg-white/5 flex gap-2">
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKey}
               rows={2}
               placeholder="Ask about HMPI results, limits, or mitigation…"
-              className="flex-1 resize-none rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="flex-1 resize-none rounded-md border border-white/15 bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/60"
             />
             <button
               onClick={onSend}
               disabled={loading}
-              className="self-end rounded-md bg-emerald-600 text-white px-3 py-2 text-sm hover:bg-emerald-700 disabled:opacity-60"
+              className="self-end rounded-md bg-primary text-bg px-3 py-2 text-sm hover:opacity-90 disabled:opacity-60"
             >
               Send
             </button>

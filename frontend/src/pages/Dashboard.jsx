@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { getDataByLocationRange } from '../api/data.js';
 import LocationForm from '../components/LocationForm.jsx';
 import MineralTrendsChart from '../components/MineralTrendsChart.jsx';
@@ -10,6 +10,7 @@ export default function Dashboard() {
   const [error, setError] = useState(null);
   const [searchParams, setSearchParams] = useState(null);
   const [selectedMetals, setSelectedMetals] = useState(['pb', 'cd', 'as_metal', 'hg', 'cr']);
+  const printRef = useRef(null);
 
   const handleSearch = async (params) => {
     setLoading(true);
@@ -45,6 +46,17 @@ export default function Dashboard() {
           <h2 className="text-2xl font-semibold">Mineral Trends Dashboard</h2>
           <p className="text-white/60 mt-1">Analyze heavy metal concentration patterns over time by location</p>
         </div>
+        <div className="flex items-center gap-2">
+          {searchData && searchParams && !loading && (
+            <button
+              className="px-3 py-2 rounded-lg border border-white/15 hover:border-white/30 hover:bg-white/5 transition-colors"
+              onClick={() => window.print()}
+              title="Export results to PDF"
+            >
+              Export to PDF
+            </button>
+          )}
+        </div>
       </div>
 
       <LocationForm onSearch={handleSearch} loading={loading} />
@@ -71,7 +83,7 @@ export default function Dashboard() {
       )}
 
       {searchData && searchParams && !loading && (
-        <div className="space-y-6">
+        <div ref={printRef} className="space-y-6 print-area">
           {/* Search Summary */}
           <div className="card p-4 bg-primary/5 border-primary/20">
             <div className="flex items-center gap-3">

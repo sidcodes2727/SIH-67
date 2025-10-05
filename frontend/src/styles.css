@@ -11,6 +11,26 @@ a { color: inherit; }
 .card:hover { transform: translateY(-1px); }
 .btn { @apply px-4 py-2 rounded-lg bg-primary text-bg hover:opacity-90 transition; }
 .input { @apply bg-card border border-white/10 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-primary; }
+
+/* Print styles for Export to PDF */
+@media print {
+  /* Reset backgrounds and colors for readability */
+  :root { color-scheme: light; }
+  body { background: #fff !important; color: #000 !important; }
+
+  /* Hide non-essential UI */
+  header, nav, .btn, .no-print, .leaflet-control-container { display: none !important; }
+
+  /* Only print the designated area */
+  .print-area { display: block !important; }
+  /* Avoid dark theme colors on paper */
+  .print-area, .print-area * { color: #000 !important; }
+
+  /* Simplify cards for print */
+  .card { box-shadow: none !important; border-color: #e5e7eb !important; background: #fff !important; }
+
+  /* Page size and margins are handled by browser print dialog */
+}
 .label { @apply text-sm text-white/70 mb-1; }
 
 /* App Background */
