@@ -47,3 +47,26 @@ html:not(.dark) .glass { background-color: rgba(255,255,255,0.7); border-color: 
 .skeleton { background: linear-gradient(90deg, #1a2234 25%, #1d2740 37%, #1a2234 63%); background-size: 400% 100%; animation: pulseSkeleton 1.5s ease-in-out infinite; }
 .skeleton-text { height: 0.9rem; border-radius: 9999px; }
 .skeleton-box { border-radius: 0.75rem; }
+
+/* Hero ornaments */
+.hero-orb {
+  position: absolute;
+  width: 28rem; /* 448px */
+  height: 28rem;
+  border-radius: 9999px;
+  filter: blur(60px);
+  background: radial-gradient(circle at 50% 50%, rgba(100,255,218,0.18), transparent 60%);
+  pointer-events: none;
+}
+
+.bg-dot-grid {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.divider-faint {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+}
