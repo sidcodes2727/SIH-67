@@ -9,7 +9,7 @@ export default function About() {
             Heavy Metal Pollution Index
           </span>
           <h1 className="mt-4 text-3xl md:text-5xl font-semibold leading-tight">
-            Understand water quality at a glance with HMPI
+            Understand water quality at a glance with JalDrishti
           </h1>
           <p className="mt-4 text-white/80 text-sm md:text-base">
             Upload measurements, compute a standardized index, and visualize hotspots. Built for environmental monitoring and rapid decision making.

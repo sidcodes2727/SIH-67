@@ -19,11 +19,12 @@ function DynamicPoints({ points }) {
 
   useEffect(() => {
     const onZoom = () => setZoom(map.getZoom());
-    map.on('zoomend', onZoom);
+    // listen continuously for smoother radius updates while zooming
+    map.on('zoom', onZoom);
     // initialize in case map changes programmatically
     onZoom();
     return () => {
-      map.off('zoomend', onZoom);
+      map.off('zoom', onZoom);
     };
   }, [map]);
 
@@ -31,11 +32,13 @@ function DynamicPoints({ points }) {
   const minZoom = map.getMinZoom?.() ?? 0;
 
   const radiusForZoom = (z) => {
-    const minR = 3; // when fully zoomed out
-    const maxR = 8; // keep same at full zoom in
+    const minR = 2; // smaller when fully zoomed out
+    const maxR = 10; // larger when fully zoomed in
     const clamped = Math.min(Math.max(z, minZoom), maxZoom);
     const t = (clamped - minZoom) / Math.max(1, (maxZoom - minZoom));
-    return Math.round(minR + t * (maxR - minR));
+    // ease-in scaling for stronger change near higher zooms
+    const eased = Math.pow(t, 1.6);
+    return Math.round(minR + eased * (maxR - minR));
   };
 
   const r = radiusForZoom(zoom);

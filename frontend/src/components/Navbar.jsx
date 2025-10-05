@@ -10,7 +10,14 @@ export default function Navbar({ onNavigate, onBack, canGoBack }) {
               ←
             </button>
           )}
-          <div className="font-semibold text-2xl md:text-3xl tracking-tight">HMPI</div>
+          <div className="flex items-center gap-3 md:gap-4">
+            <img
+              src="/src/assets/logo.png"
+              alt="JalDrishti logo"
+              className="w-10 h-10 md:w-12 md:h-12 object-contain rounded-lg shadow-sm"
+            />
+            <div className="font-extrabold text-2xl md:text-3xl tracking-tight leading-none">JalDrishti</div>
+          </div>
         </div>
         <nav className="hidden md:flex gap-2 items-center">
           <button onClick={() => onNavigate('home')} className="px-3 py-2 rounded-lg hover:text-primary hover:bg-white/5 transition-colors">Home</button>
