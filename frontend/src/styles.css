@@ -2,7 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-:root { color-scheme: dark; }
+:root { 
+  color-scheme: dark; 
+  --primary: #64ffda; /* match tailwind theme.colors.primary */
+}
 
 a { color: inherit; }
 
@@ -60,23 +63,88 @@ html:not(.dark) .glass { background-color: rgba(255,255,255,0.7); border-color: 
 .animate-slideIn { animation: slideIn 0.25s ease-out both; }
 
 @keyframes pulseSkeleton {
-  0% { opacity: 0.5; }
   50% { opacity: 0.9; }
   100% { opacity: 0.5; }
 }
 .skeleton { background: linear-gradient(90deg, #1a2234 25%, #1d2740 37%, #1a2234 63%); background-size: 400% 100%; animation: pulseSkeleton 1.5s ease-in-out infinite; }
+
 .skeleton-text { height: 0.9rem; border-radius: 9999px; }
 .skeleton-box { border-radius: 0.75rem; }
 
-/* Hero ornaments */
-.hero-orb {
-  position: absolute;
-  width: 28rem; /* 448px */
-  height: 28rem;
+/* Input range styles */
+.range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 0.5rem; /* overall track height */
+  background: transparent;
+}
+
+/* WebKit (Chrome, Edge, Safari) */
+.range::-webkit-slider-runnable-track {
+  height: 0.5rem;
+  background: rgba(255,255,255,0.15);
+  border-radius: 0.25rem;
+}
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  margin-top: -0.375rem; /* center thumb on 0.5rem track when thumb is 1.25rem */
+  width: 1.25rem;
+  height: 1.25rem;
+  background: var(--primary);
   border-radius: 9999px;
-  filter: blur(60px);
-  background: radial-gradient(circle at 50% 50%, rgba(100,255,218,0.18), transparent 60%);
-  pointer-events: none;
+  border: 2px solid rgba(0,0,0,0.25);
+  box-shadow: 0 0 0 4px rgba(100,255,218,0.15);
+  cursor: pointer;
+}
+.range:focus::-webkit-slider-thumb {
+  box-shadow: 0 0 0 6px rgba(100,255,218,0.25);
+}
+
+/* Firefox */
+.range::-moz-range-track {
+  height: 0.5rem;
+  background: rgba(255,255,255,0.15);
+  border-radius: 0.25rem;
+}
+.range::-moz-range-progress {
+  height: 0.5rem;
+  background: var(--primary);
+  border-radius: 0.25rem;
+}
+.range::-moz-range-thumb {
+  width: 1.25rem;
+  height: 1.25rem;
+  background: var(--primary);
+  border-radius: 9999px;
+  border: 2px solid rgba(0,0,0,0.25);
+  box-shadow: 0 0 0 4px rgba(100,255,218,0.15);
+  cursor: pointer;
+}
+
+/* IE/Edge (non-Chromium, legacy) */
+.range::-ms-track {
+  height: 0.5rem;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+.range::-ms-fill-lower {
+  background: var(--primary);
+  border-radius: 0.25rem;
+}
+.range::-ms-fill-upper {
+  background: rgba(255,255,255,0.15);
+  border-radius: 0.25rem;
+}
+.range::-ms-thumb {
+  width: 1.25rem;
+  height: 1.25rem;
+  background: var(--primary);
+  border-radius: 9999px;
+  border: 2px solid rgba(0,0,0,0.25);
+  cursor: pointer;
 }
 
 .bg-dot-grid {

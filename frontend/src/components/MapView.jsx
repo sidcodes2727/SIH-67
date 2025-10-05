@@ -51,6 +51,9 @@ function DynamicPoints({ points }) {
             <div>
               <div><b>HMPI:</b> {p.hmpi ?? '-'}</div>
               <div><b>Category:</b> {p.category ?? '-'}</div>
+              {p.timestamp && (
+                <div><b>Date:</b> {formatDate(p.timestamp)}</div>
+              )}
               <div><b>Lat/Lng:</b> {p.latitude}, {p.longitude}</div>
             </div>
           </Popup>
@@ -64,4 +67,14 @@ function categoryColor(cat) {
   if (cat === 'Hazardous') return 'red';
   if (cat === 'Moderate') return 'orange';
   return 'green';
+}
+
+function formatDate(ts) {
+  try {
+    const d = new Date(ts);
+    if (isNaN(d.getTime())) return String(ts);
+    return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  } catch {
+    return String(ts);
+  }
 }
