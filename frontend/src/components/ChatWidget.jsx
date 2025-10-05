@@ -58,7 +58,7 @@ export default function ChatWidget() {
       {/* Floating chat PNG icon toggle (larger, fitted in circle) */}
       <button
         onClick={() => setOpen((v) => !v)}
-        className="fixed bottom-8 right-8 z-40 grid place-items-center w-20 h-20 rounded-full bg-white/10 border border-white/15 backdrop-blur hover:bg-white/20 transition overflow-hidden ring-1 ring-white/10 hover:ring-white/30 focus-visible:ring-white/40 p-2 transition-transform hover:scale-105 active:scale-95"
+        className="fixed bottom-8 right-8 z-[9999] grid place-items-center w-20 h-20 rounded-full bg-white/10 border border-white/15 backdrop-blur hover:bg-white/20 transition overflow-hidden ring-1 ring-white/10 hover:ring-white/30 focus-visible:ring-white/40 p-2 transition-transform hover:scale-105 active:scale-95"
         aria-label={open ? 'Close chatbot' : 'Open chatbot'}
       >
         <img src="/src/assets/logo.png" alt="Logo" className="w-full h-full object-contain pointer-events-none" />
@@ -72,7 +72,7 @@ export default function ChatWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.98 }}
             transition={{ type: 'spring', stiffness: 260, damping: 20, duration: 0.2 }}
-            className="fixed bottom-24 right-6 z-40 w-[28rem] max-w-[95vw] bg-card/95 backdrop-blur border border-white/10 rounded-xl shadow-2xl flex flex-col overflow-hidden"
+            className="fixed bottom-24 right-6 z-[9999] w-[28rem] max-w-[95vw] bg-card/95 backdrop-blur border border-white/10 rounded-xl shadow-2xl flex flex-col overflow-hidden"
           >
             {/* Header */}
             <div className="px-4 py-3 border-b border-white/10 bg-white/5 flex items-center justify-between">
