@@ -8,46 +8,67 @@ export async function getRecentSamples(limit = 10) {
 }
 
 export async function getLatestHMPIByLocation(lat, lon) {
-  // find latest timestamp for exact lat/lon, then compute HMPI across metals for that timestamp
-  const latest = await query(
-    `SELECT timestamp FROM heavy_metal_data WHERE latitude=$1 AND longitude=$2 ORDER BY timestamp DESC LIMIT 1`,
+  // 1) Try exact match, latest timestamp
+  let latest = await query(
+    `SELECT * FROM heavy_metal_data WHERE latitude=$1 AND longitude=$2 ORDER BY timestamp DESC LIMIT 1`,
     [lat, lon]
   );
-  if (!latest.rows[0]) return null;
-  const ts = latest.rows[0].timestamp;
-  const group = await query(
-    `SELECT * FROM heavy_metal_data WHERE latitude=$1 AND longitude=$2 AND timestamp=$3`,
-    [lat, lon, ts]
+  if (latest.rows[0]) {
+    const row = latest.rows[0];
+    const hcat = row.hmpi != null && row.category
+      ? { hmpi: Number(row.hmpi), category: row.category }
+      : computeHMPI(row);
+    return { latitude: row.latitude, longitude: row.longitude, timestamp: row.timestamp, ...hcat };
+  }
+
+  // 2) Fallback: nearest location within a reasonable box, ordered by distance then timestamp
+  const near = await query(
+    `SELECT *, ((latitude - $1)^2 + (longitude - $2)^2) AS dist
+     FROM heavy_metal_data
+     WHERE latitude BETWEEN $1 - 0.1 AND $1 + 0.1
+       AND longitude BETWEEN $2 - 0.1 AND $2 + 0.1
+     ORDER BY dist ASC, timestamp DESC
+     LIMIT 1`,
+    [lat, lon]
   );
-  const { hmpi, category } = computeHMPI(group.rows);
-  return { latitude: lat, longitude: lon, timestamp: ts, hmpi, category, sampleCount: group.rows.length };
+  if (near.rows[0]) {
+    const row = near.rows[0];
+    const hcat = row.hmpi != null && row.category
+      ? { hmpi: Number(row.hmpi), category: row.category }
+      : computeHMPI(row);
+    return { latitude: row.latitude, longitude: row.longitude, timestamp: row.timestamp, ...hcat };
+  }
+
+  return null;
 }
 
 export async function getTopHazardousSites(limit = 5) {
-  // Compute HMPI per site (lat,lon,timestamp) on recent data and return top by HMPI
+  // Compute HMPI per latest sample per site in recent 365 days
   const recent = await query(
-    `SELECT latitude, longitude, timestamp FROM heavy_metal_data 
-     WHERE timestamp > NOW() - INTERVAL '365 days'
-     GROUP BY latitude, longitude, timestamp
-     ORDER BY timestamp DESC LIMIT 200`
+    `SELECT DISTINCT ON (latitude, longitude)
+            latitude, longitude, timestamp, hmpi, category
+       FROM heavy_metal_data
+      WHERE timestamp > NOW() - INTERVAL '365 days'
+      ORDER BY latitude, longitude, timestamp DESC`
   );
-  const results = [];
-  for (const row of recent.rows) {
-    const group = await query(
-      `SELECT * FROM heavy_metal_data WHERE latitude=$1 AND longitude=$2 AND timestamp=$3`,
-      [row.latitude, row.longitude, row.timestamp]
-    );
-    const { hmpi, category } = computeHMPI(group.rows);
-    results.push({ latitude: row.latitude, longitude: row.longitude, timestamp: row.timestamp, hmpi, category });
-  }
-  results.sort((a, b) => b.hmpi - a.hmpi);
-  return results.slice(0, limit);
+  const rows = recent.rows.map(r => {
+    if (r.hmpi == null || !r.category) {
+      const hcat = computeHMPI(r);
+      return { ...r, ...hcat };
+    }
+    return { ...r, hmpi: Number(r.hmpi) };
+  });
+  rows.sort((a, b) => b.hmpi - a.hmpi);
+  return rows.slice(0, limit);
 }
 
 export async function searchByMetal(metal, limit = 10) {
+  // Map metal symbol to column in the new schema
+  const col = ({ Pb: 'pb', Cd: 'cd', As: 'as_metal', Hg: 'hg', Cr: 'cr' })[metal];
+  if (!col) return [];
   const r = await query(
-    `SELECT * FROM heavy_metal_data WHERE metal_type=$1 ORDER BY timestamp DESC LIMIT $2`,
-    [metal, limit]
+    `SELECT * FROM heavy_metal_data WHERE ${col} IS NOT NULL ORDER BY ${col} DESC, timestamp DESC LIMIT $1`,
+    [limit]
   );
   return r.rows;
 }

@@ -17,21 +17,16 @@ export async function chat(req, res, next) {
     };
 
     if (rowId) {
-      const row = await query("SELECT * FROM heavy_metal_data WHERE id=$1", [rowId]);
-      if (row.rows[0]) {
-        const { latitude, longitude, timestamp } = row.rows[0];
-        const group = await query(
-          `SELECT * FROM heavy_metal_data WHERE latitude=$1 AND longitude=$2 AND timestamp=$3`,
-          [latitude, longitude, timestamp]
-        );
-        const { hmpi, category } = computeHMPI(group.rows);
+      const r = await query("SELECT * FROM heavy_metal_data WHERE id=$1", [rowId]);
+      const row = r.rows[0];
+      if (row) {
+        const hcat = row.hmpi != null && row.category ? { hmpi: Number(row.hmpi), category: row.category } : computeHMPI(row);
         domainContext.hmpiExample = {
-          latitude,
-          longitude,
-          timestamp,
-          hmpi,
-          category,
-          sampleCount: group.rows.length,
+          latitude: row.latitude,
+          longitude: row.longitude,
+          timestamp: row.timestamp,
+          ...hcat,
+          sampleCount: 1,
         };
       }
     }
@@ -41,14 +36,35 @@ export async function chat(req, res, next) {
     const q = (lastUser?.content || '').toLowerCase();
     const findings = {};
 
-    // Parse coordinates: e.g., "at 18.52, 73.85" or "lat 18.52 lon 73.85"
-    const coordMatch = q.match(/(-?\d{1,2}\.\d+)[,\s]+(-?\d{1,3}\.\d+)/);
-    if (coordMatch) {
-      const lat = parseFloat(coordMatch[1]);
-      const lon = parseFloat(coordMatch[2]);
-      if (!Number.isNaN(lat) && !Number.isNaN(lon)) {
-        const site = await getLatestHMPIByLocation(lat, lon);
-        if (site) findings.latestAtLocation = site;
+    // Parse coordinates in flexible formats
+    // Patterns supported:
+    //  - "18.5204, 73.8567" or "18.5204 73.8567"
+    //  - "lat 18.5204 lon 73.8567" or "latitude: 18.5204, longitude: 73.8567"
+    let latParsed = null, lonParsed = null;
+    const pairMatch = q.match(/(-?\d{1,2}(?:\.\d+)?)[,\s]+(-?\d{1,3}(?:\.\d+)?)/);
+    if (pairMatch) {
+      latParsed = parseFloat(pairMatch[1]);
+      lonParsed = parseFloat(pairMatch[2]);
+    } else {
+      const latMatch = q.match(/\b(lat|latitude)[:\s]+(-?\d{1,2}(?:\.\d+)?)/);
+      const lonMatch = q.match(/\b(lon|long|longitude)[:\s]+(-?\d{1,3}(?:\.\d+)?)/);
+      if (latMatch) latParsed = parseFloat(latMatch[2]);
+      if (lonMatch) lonParsed = parseFloat(lonMatch[2]);
+    }
+
+    if (latParsed !== null || lonParsed !== null) {
+      // If only one coordinate provided, short-circuit with a helpful reply
+      if (latParsed === null || lonParsed === null || Number.isNaN(latParsed) || Number.isNaN(lonParsed)) {
+        return res.json({ reply: 'Please provide both latitude and longitude (e.g., 18.5204, 73.8567) to look up HMPI from the database.' });
+      }
+
+      // Coordinates present: try to fetch latest HMPI/category from DB
+      const site = await getLatestHMPIByLocation(latParsed, lonParsed);
+      if (site) {
+        const msg = `At (${site.latitude.toFixed(4)}, ${site.longitude.toFixed(4)}) on ${new Date(site.timestamp).toISOString().slice(0,10)}, HMPI is ${Number(site.hmpi).toFixed(2)} (${site.category}). Safe < 50, Moderate 50–100, Hazardous > 100.`;
+        return res.json({ reply: msg });
+      } else {
+        return res.json({ reply: `No data available for (${latParsed.toFixed(4)}, ${lonParsed.toFixed(4)}) in the database.` });
       }
     }
 

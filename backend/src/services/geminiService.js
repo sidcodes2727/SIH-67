@@ -4,7 +4,7 @@ const MODEL_NAME = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
 function getClient() {
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) throw new Error("GEMINI_API_KEY is not set");
+  if (!apiKey) return null;
   return new GoogleGenAI({ apiKey });
 }
 
@@ -16,6 +16,24 @@ const BASE_SYSTEM_PROMPT = `You are an environmental assistant specialized in gr
 - If you are unsure, say so and suggest how to obtain the data needed.
  - Keep answers concise (2-4 short sentences). Use bullet points only when necessary. Avoid repetition.
 `;
+
+function buildFallbackReply(messages, domainContext) {
+  const lastUser = [...messages].reverse().find(m => m.role === 'user');
+  const parts = [];
+  if (domainContext?.findings?.latestAtLocation) {
+    const s = domainContext.findings.latestAtLocation;
+    parts.push(`At (${s.latitude.toFixed(4)}, ${s.longitude.toFixed(4)}), the latest HMPI is ${s.hmpi} (${s.category}).`);
+  }
+  if (domainContext?.findings?.topHazardous?.length) {
+    const top = domainContext.findings.topHazardous.slice(0,3).map(t => `${t.hmpi} at (${t.latitude.toFixed(2)},${t.longitude.toFixed(2)})`).join('; ');
+    parts.push(`Top hazardous (last year): ${top}.`);
+  }
+  if (parts.length === 0) {
+    parts.push('I can help with HMPI at a specific location. Share latitude and longitude like "18.5204, 73.8567".');
+  }
+  parts.push('Safe < 50, Moderate 50–100, Hazardous > 100.');
+  return parts.join(' ');
+}
 
 export async function generateChatReply(messages, domainContext = {}) {
   const ai = getClient();
@@ -35,7 +53,15 @@ export async function generateChatReply(messages, domainContext = {}) {
   const history = messages.map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`).join("\n");
   const prompt = `${grounding}\n\nConversation so far:\n${history}\n\nAssistant:`;
 
-  const response = await ai.models.generateContent({ model: MODEL_NAME, contents: prompt });
-  const text = response?.text ?? "";
-  return text.trim();
+  if (!ai) {
+    return buildFallbackReply(messages, domainContext);
+  }
+
+  try {
+    const response = await ai.models.generateContent({ model: MODEL_NAME, contents: prompt });
+    const text = response?.text ?? "";
+    return text.trim() || buildFallbackReply(messages, domainContext);
+  } catch (e) {
+    return buildFallbackReply(messages, domainContext);
+  }
 }
